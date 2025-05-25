@@ -53,7 +53,8 @@ def build_dataset(args):
             image_list.append(image.reshape(-1))
             i += 1
             filename = f"frame_{i}.jpg"
-        X = np.array(image_list)
+        X = np.array(image_list)[:60]
+        print(X.shape)
         y = None
     else:
         raise NotImplemented("Not implemented yet")

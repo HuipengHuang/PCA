@@ -1,4 +1,6 @@
 import argparse
+import os
+
 import matplotlib.pyplot as plt
 from dataset.utils import build_dataset
 from PCA.utils import get_pca, visualize_results, save_grayscale_array_as_video
@@ -19,7 +21,7 @@ parser.add_argument("--kernel", type=str, default="rbf",
 parser.add_argument("--gamma", type=float, default=10)
 
 #hyperparameter for sparse_pca
-parser.add_argument("--max_iter", type=int, default=1)
+parser.add_argument("--max_iter", type=int, default=1000)
 parser.add_argument("--tol", type=float, default=None)
 
 args = parser.parse_args()
@@ -72,7 +74,26 @@ else:
         X_train = X_train.reshape(-1, 282, 378)
         L = L.reshape(-1, 282, 378)
         S = S.reshape(-1, 282, 378)
-        save_grayscale_array_as_video(X_train, output_path="./output/video/origin.mp4")
-        save_grayscale_array_as_video(L, output_path="./output/video/L.mp4")
-        save_grayscale_array_as_video(S, output_path="./output/video/S.mp4")
+
+        i = 0
+        output_path = f"./output/video/origin_{i}.mp4"
+        while os.path.exists(output_path):
+            i += 1
+            output_path = f"./output/video/origin_{i}.mp4"
+
+        save_grayscale_array_as_video(X_train, output_path=output_path)
+
+        output_path = f"./output/video/L_{i}.mp4"
+        while os.path.exists(output_path):
+            i += 1
+            output_path = f"./output/video/L_{i}.mp4"
+
+        save_grayscale_array_as_video(L, output_path=output_path)
+
+        output_path = f"./output/video/S_{i}.mp4"
+        while os.path.exists(output_path):
+            i += 1
+            output_path = f"./output/video/S_{i}.mp4"
+        save_grayscale_array_as_video(S, output_path=output_path)
+
 #visualize_results(X_train, transformed_X, y_train, args)
