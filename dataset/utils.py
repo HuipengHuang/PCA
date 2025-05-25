@@ -45,11 +45,14 @@ def build_dataset(args):
     elif args.dataset == "video":
         dir_path = "./data/video/JPEGS/traffic"
         image_list = []
-
-        for filename in os.listdir(dir_path):
+        i = 1
+        filename = f"frame_{i}.jpg"
+        while os.path.isfile(os.path.join(dir_path, filename)):
             image_path = os.path.join(dir_path, filename)
             image = imread(image_path)
             image_list.append(image.reshape(-1))
+            i += 1
+            filename = f"frame_{i}.jpg"
         X = np.array(image_list)
         y = None
     else:

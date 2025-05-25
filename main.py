@@ -19,7 +19,7 @@ parser.add_argument("--kernel", type=str, default="rbf",
 parser.add_argument("--gamma", type=float, default=10)
 
 #hyperparameter for sparse_pca
-parser.add_argument("--max_iter", type=int, default=1000)
+parser.add_argument("--max_iter", type=int, default=1)
 parser.add_argument("--tol", type=float, default=None)
 
 args = parser.parse_args()
