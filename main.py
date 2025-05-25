@@ -68,6 +68,7 @@ else:
         plt.savefig(f"./output/ext_yaleB/{args.pca}_S.png")
         plt.show()
     elif args.dataset == "video":
+        print("Generating video")
         X_train = X_train.reshape(-1, 282, 378)
         L = L.reshape(-1, 282, 378)
         S = S.reshape(-1, 282, 378)

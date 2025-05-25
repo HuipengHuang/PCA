@@ -17,7 +17,7 @@ class RobustPCA(BasePCA):
         super().__init__(args)
         self.lambda_ = None
         self.mu = 0.1
-        self.rho = getattr(args, 'rho', 1.1)
+        self.rho = 1.1
         self.max_iter = getattr(args, 'max_iter', 1000)
         self.tol = args.tol if args.tol else 1e-6
         self.L = None  # Low-rank component
@@ -30,6 +30,7 @@ class RobustPCA(BasePCA):
         """
         m, n = M.shape
         self.lambda_ = 1.0 / np.sqrt(max(m, n))  # Default from Candès et al.
+        self.mu = 1.25 / np.linalg.norm(M, 2)
 
         # Initialize variables
         self.L = M.copy()
@@ -47,6 +48,7 @@ class RobustPCA(BasePCA):
 
             # Step 3: Update Y
             self.Y = self.Y + self.mu * (M - self.L - self.S)
+            self.mu = self.mu * self.rho
 
             err = self.frobenius_norm(M - self.L - self.S)
             if err < self.tol:
