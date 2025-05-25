@@ -27,7 +27,7 @@ class KernelPCA(BasePCA):
 
     def _kernel(self, X, Y=None):
         """Compute kernel matrix"""
-        return pairwise_kernels(X.T, Y=Y if Y is not None else X, metric=self.kernel, gamma=self.gamma)
+        return pairwise_kernels(X, Y=Y if Y is not None else X, metric=self.kernel, gamma=self.gamma)
 
     def fit(self, X):
         """
@@ -59,12 +59,8 @@ class KernelPCA(BasePCA):
 
         self.eg_values = eg_value
         self.eg_vectors = eg_vectors
+        self.eg_vectors = self.eg_vectors / np.sqrt(self.eg_values + 1e-6)
 
-        # Normalize eigenvectors
-        print("haha")
-        self.eg_vectors = self.eg_vectors / np.sqrt(np.sum(self.eg_vectors * self.eg_vectors, axis=0))
-        print(self.eg_vectors.shape)
-        print(self.eg_vectors @ self.eg_vectors.T)
     def transform(self, X, n_components=None):
         """
         Project data onto the kernel principal components.
@@ -89,20 +85,8 @@ class KernelPCA(BasePCA):
 
         return X_transformed
 
-    def center(self, the_matrix):
-        n_rows = the_matrix.shape[0]
-        n_cols = the_matrix.shape[1]
-        vector_one_left = np.ones((n_rows,1))
-        vector_one_right = np.ones((n_cols, 1))
-        H_left = np.eye(n_rows) - ((1/n_rows) * vector_one_left.dot(vector_one_left.T))
-        H_right = np.eye(n_cols) - ((1 / n_cols) * vector_one_right.dot(vector_one_right.T))
-
-        mode = self.args.mode
-        if mode == "double_center":
-            the_matrix = H_left.dot(the_matrix).dot(H_right)
-        elif mode == "remove_mean_of_rows_from_rows":
-            the_matrix = H_left.dot(the_matrix)
-        elif mode == "remove_mean_of_columns_from_columns":
-            the_matrix = the_matrix.dot(H_right)
-
-        return the_matrix
+    def center(self, K):
+        n = K.shape[0]
+        one_n = np.ones((n, n)) / n
+        K_centered = K - one_n.dot(K) - K.dot(one_n) + one_n.dot(K).dot(one_n)
+        return K_centered
