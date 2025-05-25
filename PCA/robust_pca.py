@@ -37,8 +37,6 @@ class RobustPCA(BasePCA):
         self.Y = np.zeros_like(M)
 
         for k in range(self.max_iter):
-            L_prev, S_prev, Y_prev = self.L.copy(), self.S.copy(), self.Y.copy()
-
             # Step 1: Update L
             res = M - self.S - 1 / self.mu * self.Y
             self.L = self.sv_threshold(res)
@@ -50,8 +48,8 @@ class RobustPCA(BasePCA):
             # Step 3: Update Y
             self.Y = self.Y + self.mu * (M - self.L - self.S)
 
-            # Check convergence
-            if np.allclose(L_prev, self.L, atol=self.tol) and np.allclose(S_prev, self.S, atol=self.tol) and np.allclose(Y_prev, self.Y, atol=self.tol):
+            err = self.frobenius_norm(M - self.L - self.S)
+            if err < self.tol:
                 break
 
     def transform(self, X, n_components=None):
@@ -71,3 +69,6 @@ class RobustPCA(BasePCA):
         U, eg_value, V_T = np.linalg.svd(X, full_matrices=False)
         new_eg_value = self.shrinkage_operator(eg_value, self.mu)
         return U @ np.diag(new_eg_value) @ V_T
+
+    def frobenius_norm(self, M):
+        return np.linalg.norm(M, ord='fro')

@@ -11,7 +11,7 @@ class SparsePCA(BasePCA):
         super().__init__(args)
         self.lambda_ = 1.0
         self.lambda1 = 1.0
-        self.max_iter = getattr(args, 'max_iter', 1000)
+        self.max_iter = args.max_iter if args.max_iter else 1000
         self.tol = args.tol if args.tol else 1e-6
         self.A = None
         self.B = None

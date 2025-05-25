@@ -6,7 +6,8 @@ from .sparese_pca import SparsePCA
 from .ppca import ProbabilisticPCA
 from .robust_pca import RobustPCA
 import matplotlib.pyplot as plt
-
+import cv2
+import numpy as np
 
 
 
@@ -90,3 +91,16 @@ def visualize_results(X_original, X_transformed, y, args):
             save_path = f"./output/{args.dataset}/{args.kernel}_{args.gamma}_{args.n_components}_{i}.pdf"
         plt.savefig(save_path, format='pdf', bbox_inches='tight')
     plt.show()
+
+def save_grayscale_array_as_video(video_array, output_path, fps=30):
+    height, width = video_array.shape[1:3]
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+    for frame in video_array:
+        if frame.dtype != np.uint8:
+            frame = frame.astype(np.uint8)
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+        out.write(frame_bgr)
+
+    out.release()
