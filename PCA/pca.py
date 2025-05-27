@@ -8,6 +8,7 @@ class PCA(BasePCA):
         self.eigen_value = None
         self.V = None
 
+
     def fit(self, X):
         """
         Fit the PCA model to the data using SVD.
@@ -17,7 +18,6 @@ class PCA(BasePCA):
         """
 
         self.mean = np.mean(X, axis=0)
-
         X_centered = X - self.mean[np.newaxis, :]
 
         # Perform SVD on centered data
@@ -50,3 +50,25 @@ class PCA(BasePCA):
         X_transformed = np.dot(X_centered, self.V[:, :n])
 
         return X_transformed
+
+    def inverse_transform(self, X_transformed):
+        """
+        Transform data back to its original space from the reduced representation.
+
+        Args:
+            X_transformed (np.ndarray): Reduced data, shape (n_samples, n_components).
+            n_components (int, optional): Number of components used in the transformation.
+                                         Defaults to self.n_components.
+
+        Returns:
+            np.ndarray: Data in original feature space, shape (n_samples, n_features).
+        """
+
+        # Project the reduced data back to the original feature space
+
+        X_reconstructed = np.dot(X_transformed, self.V.T[:self.n_components])
+
+        # Add back the mean that was subtracted during transformation
+        X_reconstructed += self.mean[np.newaxis, :]
+
+        return X_reconstructed

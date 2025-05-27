@@ -1,9 +1,12 @@
-import numpy as np
-from skimage.io import imread
-import matplotlib.pyplot as plt
+import requests
+import os
+file_url = "https://github.com/dlaptev/RobustPCA/blob/master/examples/RobustPCA_video_demo.avi?raw=true"
+output_file = "RobustPCA_video_demo.avi"
 
-image_path = r"C:\Users\27859\Desktop\PyCharm 2024.1.3\jbr\bin\E\Users\27859\PycharmProjects\optim_project\data\yaleB\subject01.glasses"
-image = imread(image_path)
-print("Image shape:", image.shape)  # Likely (1, 243, 320) or (243, 320)
-plt.imshow(image.reshape(243, 320, 1), cmap='gray')
-plt.show()
+if not os.path.exists(output_file):
+    print(f"Downloading {output_file}...")
+    r = requests.get(file_url, stream=True)
+    with open(output_file, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=8192):
+            f.write(chunk)
+    print("Download complete!")

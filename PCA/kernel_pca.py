@@ -90,3 +90,32 @@ class KernelPCA(BasePCA):
         one_n = np.ones((n, n)) / n
         K_centered = K - one_n.dot(K) - K.dot(one_n) + one_n.dot(K).dot(one_n)
         return K_centered
+
+    def inverse_transform(self, X_transformed, n_components=None):
+        """
+        Transform data back to its original space from the reduced representation.
+
+        Args:
+            X_transformed (np.ndarray): Reduced data, shape (n_samples, n_components).
+            n_components (int, optional): Number of components used in the transformation.
+                                         Defaults to self.n_components.
+
+        Returns:
+            np.ndarray: Approximate reconstruction in original feature space.
+        """
+        n = n_components if n_components is not None else self.n_components
+
+        # Compute the pseudo-inverse of the transformed training data
+        X_transformed_train = self.eg_vectors[:, :n] * np.sqrt(self.eg_values[:n]+1e-10)
+
+        # Project back to kernel space
+        K_approx = np.dot(X_transformed, X_transformed_train.T)
+
+        # Perform kernel ridge regression to approximate the inverse mapping
+        K_train = self._kernel(self.X_fit)
+        K_train_inv = np.linalg.pinv(K_train)
+
+        # Reconstruct the original data approximation
+        X_reconstructed = np.dot(K_approx, np.dot(K_train_inv, self.X_fit))
+
+        return X_reconstructed
